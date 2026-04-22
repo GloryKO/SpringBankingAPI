@@ -3,6 +3,7 @@ import com.banking.banking_api.dto.RegisterRequest;
 import com.banking.banking_api.dto.RegisterResponse;
 import com.banking.banking_api.entity.Account;
 import com.banking.banking_api.entity.User;
+import com.banking.banking_api.exception.AppExceptions;
 import com.banking.banking_api.repository.AccountRepository;
 import com.banking.banking_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +26,10 @@ public class UserService {
     @Transactional
     public RegisterResponse register(RegisterRequest request){
         if (userRepository.existsByEmail(request.getEmail())){  //email cant be null because of @NotBlank in DTO, must also be unique
-            throw new RuntimeException("Email already in use");
+            throw new AppExceptions.DuplicateResourceException("Email already in use");
         }
         if (request.getPhoneNumber() != null && userRepository.existsByPhoneNumber(request.getPhoneNumber())){
-            throw new RuntimeException("Phone number already in use");
+            throw new AppExceptions.DuplicateResourceException("Phone number already in use");
         }
 
         User user = User.builder()

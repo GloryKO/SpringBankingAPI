@@ -31,28 +31,28 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(status).body(body);
     }
 
-    @ExceptionHandler(AppExceptions.DuplicateResourceException.class)
+    @ExceptionHandler(AppExceptions.DuplicateResourceException.class)// handles DuplicateResourceException anywhere in the app
     public ResponseEntity<Map<String, Object>> handleDuplicate(
             AppExceptions.DuplicateResourceException ex) {
         log.warn("Duplicate resource: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
-    @ExceptionHandler(AppExceptions.ResourceNotFoundException.class)
+    @ExceptionHandler(AppExceptions.ResourceNotFoundException.class) // handles ResourceNotFoundException anywhere in the app
     public ResponseEntity<Map<String, Object>> handleNotFound(
             AppExceptions.ResourceNotFoundException ex) {
         log.warn("Resource not found: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
-    @ExceptionHandler(AppExceptions.UnauthorizedException.class)
+    @ExceptionHandler(AppExceptions.UnauthorizedException.class) // handles UnauthorizedException anywhere in the app
     public ResponseEntity<Map<String, Object>> handleUnauthorized(
             AppExceptions.UnauthorizedException ex) {
         log.warn("Unauthorized: {}", ex.getMessage());
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
-    @ExceptionHandler(AppExceptions.InsufficientBalanceException.class)
+    @ExceptionHandler(AppExceptions.InsufficientBalanceException.class) // handles InsufficientBalanceException anywhere in the app
     public ResponseEntity<Map<String, Object>> handleInsufficientBalance(
             AppExceptions.InsufficientBalanceException ex) {
         log.warn("Insufficient balance: {}", ex.getMessage());
@@ -60,7 +60,7 @@ public class GlobalExceptionHandler {
     }
 
     // Handles @Valid failures — returns each field's error message
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class) // handles validation errors when @Valid fails in any controller
     public ResponseEntity<Map<String, Object>> handleValidationErrors(
             MethodArgumentNotValidException ex) {
 

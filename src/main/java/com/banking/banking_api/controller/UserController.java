@@ -1,4 +1,5 @@
 package com.banking.banking_api.controller;
+import com.banking.banking_api.dto.LoginRequest;
 import com.banking.banking_api.dto.RegisterRequest;
 import com.banking.banking_api.dto.RegisterResponse;
 import com.banking.banking_api.service.UserService;
@@ -6,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
@@ -18,4 +20,8 @@ public class UserController {
         return ResponseEntity.ok(response); 
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {  
+    return ResponseEntity.ok(userService.login(request));
+}
 }

@@ -8,7 +8,9 @@ import com.banking.banking_api.repository.AccountRepository;
 import com.banking.banking_api.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import java.util.Map;
+import com.banking.banking_api.dto.LoginRequest;
+import com.banking.banking_api.security.jwt.JwtUtil;
 import java.util.Random;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +24,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final AccountRepository accountRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
+    
 
     @Transactional
     public RegisterResponse register(RegisterRequest request){
@@ -70,4 +74,18 @@ public class UserService {
         } while (accountRepository.existsByAccountNumber(accountNumber));
         return accountNumber;
         }
+    
+    public Map<String, String>login(LoginRequest request) {
+        Account account = accountRepository.findByAccountNumber(request.getAccountNumber())
+                .orElseThrow(() -> new AppExceptions.ResourceNotFoundException("Account not found"));
+        User user = account.getUser();
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())){
+            throw new AppExceptions.UnauthorizedException("Invalid credentials");
+        }
+
+        //generate token with account number 
+       String token = jwtUtil.generateToken(account.getAccountNumber());
+       log.info("User logged in: {}", user.getEmail());
+       return Map.of("token",token);
+}
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -30,7 +31,21 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(status).body(body);
     }
+        /* should probably use this for all responses instead of Map<String, Object> --- IGNORE ---
+        private ResponseEntity<ErrorResponse> buildErrorResponse(
+                HttpStatus status, String message) {
 
+            ErrorResponse body = ErrorResponse.builder()
+                    .timestamp(LocalDateTime.now().toString())
+                    .status(status.value())
+                    .error(status.getReasonPhrase())
+                    .message(message)
+                    .build();
+
+            return ResponseEntity.status(status).body(body);
+        }
+
+        */  
     @ExceptionHandler(AppExceptions.DuplicateResourceException.class)// handles DuplicateResourceException anywhere in the app
     public ResponseEntity<Map<String, Object>> handleDuplicate(
             AppExceptions.DuplicateResourceException ex) {

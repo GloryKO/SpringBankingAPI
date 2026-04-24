@@ -12,6 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.http.HttpStatus;
+import com.banking.banking_api.dto.CheckPinResponse;
 
 import java.util.Map;
 @Service
@@ -23,17 +25,16 @@ public class AccountService {
     //helper method to get account number from logged in user
     private Account getCurrentAccount(){
         String accountNumber = SecurityContextHolder.getContext().getAuthentication().getName(); //account number is stored as the "username" in the token
-        return accountRepository.findByAccountNumber(accountNumber).orElseThrow(() -> new IllegalArgumentException("Account not found"));
+        return accountRepository.findByAccountNumber(accountNumber)
+                                .orElseThrow(() -> new IllegalArgumentException("Account not found"));
     }
 
-    public Map<String, Object> checkPin() {
+    public CheckPinResponse checkPin() {
         Account account = getCurrentAccount();
 
-        return Map.of(
-                "hasPIN", account.isHasPin(),
-                "msg", account.isHasPin()
-                        ? "PIN has been created for this account"
-                        : "PIN has not been created for this account"
-        );
+        return CheckPinResponse.builder()
+                .hasPin(account.isHasPin())
+                .message(account.isHasPin() ? "PIN has been created for this account" : "PIN has not been created for this account")
+                .build();
     }
 }

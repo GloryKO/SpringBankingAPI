@@ -13,6 +13,8 @@ import com.banking.banking_api.dto.CreatePinResponse;
 import com.banking.banking_api.dto.UpdatePinResponse;
 import com.banking.banking_api.dto.PinRequest;
 import com.banking.banking_api.dto.UpdatePinRequest;
+import com.banking.banking_api.dto.TransactionRequest;
+import com.banking.banking_api.dto.TransactionResponse;
 
 import jakarta.validation.Valid;
 
@@ -40,4 +42,10 @@ public class AccountController {
         UpdatePinResponse response = accountService.updatePin(request);
         return ResponseEntity.ok(response);
 }
+@PostMapping("/deposit")
+public ResponseEntity<TransactionResponse> deposit(@Valid@RequestBody TransactionRequest request) {
+    TransactionResponse response = accountService.deposit(request);
+    return ResponseEntity.ok(response);
+}
+
 }

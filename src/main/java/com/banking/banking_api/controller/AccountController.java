@@ -5,6 +5,7 @@ import com.banking.banking_api.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import com.banking.banking_api.dto.CheckPinResponse;
@@ -28,7 +29,7 @@ public class AccountController {
         return ResponseEntity.ok(response);
 }
 
-    @GetMapping("/create-pin")
+    @PostMapping("/create-pin")
      public ResponseEntity<CreatePinResponse> createPin(@Valid @RequestBody PinRequest request) {
         CreatePinResponse response = accountService.createPin(request);
         return ResponseEntity.ok(response);

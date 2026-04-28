@@ -2,6 +2,8 @@ package com.banking.banking_api.controller;
 import com.banking.banking_api.dto.LoginRequest;
 import com.banking.banking_api.dto.RegisterRequest;
 import com.banking.banking_api.dto.RegisterResponse;
+import com.banking.banking_api.dto.UpdateProfileRequest;
+import com.banking.banking_api.dto.UpdateProfileResponse;
 import com.banking.banking_api.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,4 +26,10 @@ public class UserController {
     public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequest request) {  
     return ResponseEntity.ok(userService.login(request));
 }
+    // PUT /api/users/update
+    @PutMapping("/update")
+    public ResponseEntity<UpdateProfileResponse> updateProfile(
+            @Valid @RequestBody UpdateProfileRequest request) {
+        return ResponseEntity.ok(userService.updateProfile(request));
+    }
 }

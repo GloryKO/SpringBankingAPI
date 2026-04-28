@@ -1,6 +1,8 @@
 package com.banking.banking_api.service;
 import com.banking.banking_api.dto.RegisterRequest;
 import com.banking.banking_api.dto.RegisterResponse;
+import com.banking.banking_api.dto.UpdateProfileRequest;
+import com.banking.banking_api.dto.UpdateProfileResponse;
 import com.banking.banking_api.entity.Account;
 import com.banking.banking_api.entity.User;
 import com.banking.banking_api.exception.AppExceptions;
@@ -12,6 +14,7 @@ import java.util.Map;
 import com.banking.banking_api.dto.LoginRequest;
 import com.banking.banking_api.security.jwt.JwtUtil;
 import java.util.Random;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,12 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     
+    private User getCurrrentUser(){
+        String accountNumber = SecurityContextHolder.getContext().getAuthentication().getName();
+        Account account = accountRepository.findByAccountNumber(accountNumber)
+                .orElseThrow(() -> new AppExceptions.ResourceNotFoundException("Account not found"));
+        return account.getUser();
+    }
 
     @Transactional
     public RegisterResponse register(RegisterRequest request){
@@ -88,4 +97,24 @@ public class UserService {
        log.info("User logged in: {}", user.getEmail());
        return Map.of("token",token);
 }
+ 
+    @Transactional
+    public UpdateProfileResponse updateProfile(UpdateProfileRequest request){
+        User user = getCurrrentUser();
+        if (request.getPhoneNumber() != null
+            && !request.getPhoneNumber().equals(user.getPhoneNumber())
+            && userRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+        throw new AppExceptions.DuplicateResourceException(
+                "Phone number already in use");
+    }
+        user.setName(request.getName());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setAddress(request.getAddress());
+        user.setCountryCode(request.getCountryCode());
+        User updatedUser = userRepository.save(user);
+        log.info("User profile updated: {}", updatedUser.getEmail());
+        return UpdateProfileResponse.fromEntity(updatedUser);
+    }
+
+
 }

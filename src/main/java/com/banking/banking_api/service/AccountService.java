@@ -119,4 +119,35 @@ public class AccountService {
                 .balance(newBalance.toString())
                 .build();
 }
+
+    @Transactional
+    public TransactionResponse withdraw(TransactionRequest transactionRequest){
+            Account account = getCurrentAccount();
+            if (!account.isHasPin()){
+                throw new AppExceptions.UnauthorizedException("No existing PIN found for this account");
+            }
+            if(!passwordEncoder.matches(transactionRequest.getPin(),account.getPinHash())){
+                throw new AppExceptions.UnauthorizedException("PIN is not correct");
+            } 
+            if (account.getBalance().compareTo(transactionRequest.getAmount()) < 0){
+                throw new AppExceptions.InsufficientBalanceException("Insufficient balance");
+            }
+            // Subtract the withdrawal amount from the current balance
+            BigDecimal newBalance = account.getBalance().subtract(transactionRequest.getAmount());
+            account.setBalance(newBalance);
+            accountRepository.save(account);
+            // Create a new transaction record
+            Transaction transation = Transaction.builder()
+                    .account(account)
+                    .amount(transactionRequest.getAmount())
+                    .transactionType(Transaction.TransactionType.WITHDRAWAL)
+                    .balanceAfter(newBalance)
+                    .build();
+            transactionRepository.save(transation);
+            log.info("Withdrawal of {} successful for account: {}", transactionRequest.getAmount(), account.getAccountNumber());
+            return TransactionResponse.builder()
+                    .message("Withdrawal successful")
+                    .balance(newBalance.toString())
+                    .build();
+    }
 }

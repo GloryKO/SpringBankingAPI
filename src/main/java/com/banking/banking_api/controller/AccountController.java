@@ -47,5 +47,11 @@ public ResponseEntity<TransactionResponse> deposit(@Valid@RequestBody Transactio
     TransactionResponse response = accountService.deposit(request);
     return ResponseEntity.ok(response);
 }
+@PostMapping("/withdraw")
+public ResponseEntity<TransactionResponse> withdraw(@Valid @RequestBody TransactionRequest request) {
+    TransactionResponse response = accountService.withdraw(request);
+    return ResponseEntity.ok(response);
+
+}
 
 }

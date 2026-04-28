@@ -20,6 +20,7 @@ import com.banking.banking_api.dto.CreatePinResponse;
 import com.banking.banking_api.dto.TransactionResponse;
 import com.banking.banking_api.dto.UpdatePinResponse;
 import com.banking.banking_api.dto.TransactionRequest;
+import com.banking.banking_api.dto.TransferRequest;
 import com.banking.banking_api.entity.Transaction;
 import com.banking.banking_api.repository.TransactionRepository;
 import java.math.BigDecimal;
@@ -149,5 +150,53 @@ public class AccountService {
                     .message("Withdrawal successful")
                     .balance(newBalance.toString())
                     .build();
+    }
+    @Transactional
+    public TransactionResponse transfer(TransferRequest transferRequest){
+            Account senderAccount = getCurrentAccount();
+            if (!senderAccount.isHasPin()){
+                throw new AppExceptions.UnauthorizedException("No existing PIN found for this account");
+            }
+            if(!passwordEncoder.matches(transferRequest.getPin(),senderAccount.getPinHash())){
+                throw new AppExceptions.UnauthorizedException("PIN is not correct");
+            }
+            if (senderAccount.getBalance().compareTo(transferRequest.getAmount()) < 0){
+                throw new AppExceptions.InsufficientBalanceException("Insufficient balance");
+            }
+            Account receiverAccount = accountRepository.findByAccountNumber(transferRequest.getRecipientAccountNumber())
+            .orElseThrow(() -> new AppExceptions.ResourceNotFoundException(
+                    "Target account not found"));
+
+            // Subtract the transfer amount from the current balance
+            BigDecimal newSenderBalance = senderAccount.getBalance().subtract(transferRequest.getAmount());
+            senderAccount.setBalance(newSenderBalance);
+            accountRepository.save(senderAccount);
+            // Add the transfer amount to the recipient's balance
+            BigDecimal newReceiverBalance = receiverAccount.getBalance().add(transferRequest.getAmount());
+            receiverAccount.setBalance(newReceiverBalance);
+            accountRepository.save(receiverAccount);
+            // Create a new transaction record for the sender
+        Transaction senderTransaction = Transaction.builder()
+                .account(senderAccount)
+                .amount(transferRequest.getAmount())
+                .transactionType(Transaction.TransactionType.TRANSFER_DEBIT)
+                .targetAccountNumber(receiverAccount.getAccountNumber())
+                .balanceAfter(newSenderBalance)
+                .build();
+        transactionRepository.save(senderTransaction);
+        // Create a new transaction record for the receiver
+        Transaction receiverTransaction = Transaction.builder()
+                .account(receiverAccount)
+                .amount(transferRequest.getAmount())
+                .transactionType(Transaction.TransactionType.TRANSFER_CREDIT)
+                .targetAccountNumber(senderAccount.getAccountNumber())
+                .balanceAfter(newReceiverBalance)
+                .build();
+        transactionRepository.save(receiverTransaction);
+        log.info("Transfer of {} successful from account: {} to account: {}", transferRequest.getAmount(), senderAccount.getAccountNumber(), receiverAccount.getAccountNumber());
+        return TransactionResponse.builder()
+                .message("Transfer successful")
+                .balance(newSenderBalance.toString())
+                .build();
     }
 }

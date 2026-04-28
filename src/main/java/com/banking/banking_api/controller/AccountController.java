@@ -15,6 +15,7 @@ import com.banking.banking_api.dto.PinRequest;
 import com.banking.banking_api.dto.UpdatePinRequest;
 import com.banking.banking_api.dto.TransactionRequest;
 import com.banking.banking_api.dto.TransactionResponse;
+import com.banking.banking_api.dto.TransferRequest;
 
 import jakarta.validation.Valid;
 
@@ -41,17 +42,23 @@ public class AccountController {
      public ResponseEntity<UpdatePinResponse> updatePin(@Valid @RequestBody UpdatePinRequest request) {
         UpdatePinResponse response = accountService.updatePin(request);
         return ResponseEntity.ok(response);
-}
-@PostMapping("/deposit")
-public ResponseEntity<TransactionResponse> deposit(@Valid@RequestBody TransactionRequest request) {
-    TransactionResponse response = accountService.deposit(request);
-    return ResponseEntity.ok(response);
-}
-@PostMapping("/withdraw")
-public ResponseEntity<TransactionResponse> withdraw(@Valid @RequestBody TransactionRequest request) {
-    TransactionResponse response = accountService.withdraw(request);
-    return ResponseEntity.ok(response);
+    }
+    @PostMapping("/deposit")
+    public ResponseEntity<TransactionResponse> deposit(@Valid@RequestBody TransactionRequest request) {
+        TransactionResponse response = accountService.deposit(request);
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/withdraw")
+    public ResponseEntity<TransactionResponse> withdraw(@Valid @RequestBody TransactionRequest request) {
+        TransactionResponse response = accountService.withdraw(request);
+        return ResponseEntity.ok(response);
 
-}
+    }
+
+    @PostMapping("/fund-transfer")
+    public ResponseEntity<TransactionResponse> transfer(@Valid @RequestBody TransferRequest request) {
+        TransactionResponse response = accountService.transfer(request);
+        return ResponseEntity.ok(response);
+    }
 
 }

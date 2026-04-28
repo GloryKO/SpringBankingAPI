@@ -160,8 +160,11 @@ public class AccountService {
             if(!passwordEncoder.matches(transferRequest.getPin(),senderAccount.getPinHash())){
                 throw new AppExceptions.UnauthorizedException("PIN is not correct");
             }
-            if (senderAccount.getBalance().compareTo(transferRequest.getAmount()) < 0){
+            if (transferRequest.getAmount().compareTo(senderAccount.getBalance()) > 0){ //compareTo returns 1 if amount is greater than balance, 0 if equal, -1 if less than balance
                 throw new AppExceptions.InsufficientBalanceException("Insufficient balance");
+            }
+            if (senderAccount.getAccountNumber().equals(transferRequest.getRecipientAccountNumber())){
+                throw new AppExceptions.UnauthorizedException("Cannot transfer to the same account");
             }
             Account receiverAccount = accountRepository.findByAccountNumber(transferRequest.getRecipientAccountNumber())
             .orElseThrow(() -> new AppExceptions.ResourceNotFoundException(

@@ -17,6 +17,7 @@ import com.banking.banking_api.dto.TransactionRequest;
 import com.banking.banking_api.dto.TransactionResponse;
 import com.banking.banking_api.dto.TransferRequest;
 import com.banking.banking_api.dto.TransactionHistoryResponse;
+import com.banking.banking_api.dto.AccountProfileResponse;
 
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,5 +69,8 @@ public class AccountController {
     public ResponseEntity<List<TransactionHistoryResponse>> getTransactionHistory( ) {
         return ResponseEntity.ok(accountService.getTransactionHistory());
     }
-    
+    @GetMapping("/account-profile")
+    public ResponseEntity<AccountProfileResponse> getAccountProfile() {
+        return ResponseEntity.ok(accountService.getAccountProfile());
+}
 }

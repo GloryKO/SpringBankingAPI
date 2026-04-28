@@ -24,6 +24,7 @@ import com.banking.banking_api.dto.TransferRequest;
 import com.banking.banking_api.entity.Transaction;
 import com.banking.banking_api.repository.TransactionRepository;
 import com.banking.banking_api.dto.TransactionHistoryResponse;
+import com.banking.banking_api.dto.AccountProfileResponse;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -212,5 +213,10 @@ public class AccountService {
         return transactions.stream()
                 .map(TransactionHistoryResponse::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    public AccountProfileResponse getAccountProfile(){
+        Account account = getCurrentAccount();
+        return AccountProfileResponse.fromEntities(account);
     }
 }

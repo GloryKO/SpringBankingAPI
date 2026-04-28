@@ -23,8 +23,12 @@ import com.banking.banking_api.dto.TransactionRequest;
 import com.banking.banking_api.dto.TransferRequest;
 import com.banking.banking_api.entity.Transaction;
 import com.banking.banking_api.repository.TransactionRepository;
+import com.banking.banking_api.dto.TransactionHistoryResponse;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -201,5 +205,12 @@ public class AccountService {
                 .message("Transfer successful")
                 .balance(newSenderBalance.toString())
                 .build();
+    }
+    public List<TransactionHistoryResponse> getTransactionHistory(){
+        Account account = getCurrentAccount();
+        List<Transaction> transactions = transactionRepository.findByAccountOrderByCreatedAtDesc(account);
+        return transactions.stream()
+                .map(TransactionHistoryResponse::fromEntity)
+                .collect(Collectors.toList());
     }
 }

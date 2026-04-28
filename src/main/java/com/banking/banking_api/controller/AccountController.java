@@ -16,8 +16,12 @@ import com.banking.banking_api.dto.UpdatePinRequest;
 import com.banking.banking_api.dto.TransactionRequest;
 import com.banking.banking_api.dto.TransactionResponse;
 import com.banking.banking_api.dto.TransferRequest;
+import com.banking.banking_api.dto.TransactionHistoryResponse;
 
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.RequestParam;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/accounts")
@@ -60,5 +64,9 @@ public class AccountController {
         TransactionResponse response = accountService.transfer(request);
         return ResponseEntity.ok(response);
     }
-
+    @GetMapping("/transaction-history")
+    public ResponseEntity<List<TransactionHistoryResponse>> getTransactionHistory( ) {
+        return ResponseEntity.ok(accountService.getTransactionHistory());
+    }
+    
 }

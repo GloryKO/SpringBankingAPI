@@ -74,6 +74,13 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(AppExceptions.InvalidOtpException.class) // handles InvalidOtpException anywhere in the app
+    public ResponseEntity<Map<String, Object>> handleInvalidOtp(
+            AppExceptions.InvalidOtpException ex) {
+        log.warn("Invalid OTP: {}", ex.getMessage());
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     // Handles @Valid failures — returns each field's error message
     @ExceptionHandler(MethodArgumentNotValidException.class) // handles validation errors when @Valid fails in any controller
     public ResponseEntity<Map<String, Object>> handleValidationErrors(

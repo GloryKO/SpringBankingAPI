@@ -32,4 +32,10 @@ public class AppExceptions {
             super(message);
         }
     }
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public static class InvalidOtpException extends RuntimeException {
+        public InvalidOtpException(String message) {
+            super(message);
+        }
+    }
 }
